@@ -1,0 +1,20 @@
+This Python project allows you to use two different pre-trained sentiment analysis models to read a csv file and determine the positive or negative
+sentiment of text. This can be useful in quickly understanding whether a given text is conveying positive, neutral, or negative 
+emotions from the writer. The applications for such models are obvious for many business contexts. In this case, the two models
+are used to determine the sentiment of user reviews for a coffeeshop. 
+
+Getting started with this project, you'll need a few Python staples such as:
+pandas, numpy, matplotlib, seaborn, and nltk. 
+These can all be pip installed and imported prior to starting. 
+
+Additionally, you will need to download the vaders and roberta sentiment analysis models. 
+Finally, the specific roberta model is cardiffnlp/twitter-roberta-base-sentiment. (this model will be explictly called out in 
+the source code as well)
+
+First Steps
+Import the necessary Python files and determining the shape of the expected dataframe.
+
+Next we will use the vader model to showcase tokenization and how it helps us understand the sentiment of the user reviews.
+We will then create tables to plot how the vader model is interpreting our data. 
+The final section of code will introduce the roberta model, contrast how its scores differ from the vader model
+(if at all). The code finishes with a quick data visualization showing how the two models scores correlate to each other.
