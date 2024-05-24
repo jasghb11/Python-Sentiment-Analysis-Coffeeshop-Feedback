@@ -1,0 +1,92 @@
+import pandas as pd
+import numpy as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from docx import Document
+from nltk.sentiment import SentimentIntensityAnalyzer
+
+plt.style.use('ggplot')
+
+def read_document(file_path):
+
+    doc = Document(file_path)
+    full_text = []
+    for para in doc.paragraphs:
+        full_text.append(para.text)
+    return '\n'.join(full_text)
+
+def sentiment_analysis(text):
+
+    sia = SentimentIntensityAnalyzer()
+    return sia.polarity_scores(text)
+
+if __name__ == "__main__":
+    file_path = r'C:\Users\Jason\Documents\NerdyBirdyContent.docx'
+    document_text = read_document(file_path)
+    sentiment = sentiment_analysis(document_text)
+    print(sentiment)
+
+
+
+
+def read_paragraphs(file_path):
+    doc = Document(file_path)
+    paragraphs = [para.text for para in doc.paragraphs if para.text.strip() != '']
+    return paragraphs
+
+def analyze_sentiment_by_paragraph(paragraphs):
+    sia = SentimentIntensityAnalyzer()
+    paragraph_sentiments = []
+    for paragraph in paragraphs:
+        sentiment = sia.polarity_scores(paragraph)
+        paragraph_sentiments.append(sentiment)
+    return paragraph_sentiments
+
+if __name__ == "__main__":
+    file_path = r'C:\Users\Jason\Documents\NerdyBirdyContent.docx'
+    paragraphs = read_paragraphs(file_path)
+    sentiments = analyze_sentiment_by_paragraph(paragraphs)
+
+for i, (paragraph, sentiment) in enumerate(zip(paragraphs, sentiments)):
+    print(f"Paragraph {i+1}: {paragraph}")
+    print(f"Sentiment: {sentiment}")
+    print("-" * 40)
+
+
+
+
+
+from transformers import AutoTokenizer
+from transformers import AutoModelForSequenceClassification
+from scipy.special import softmax
+import torch
+
+Model = f"cardiffnlp/twitter-roberta-base-sentiment"
+tokenizer = AutoTokenizer.from_pretrained(Model)
+model = AutoModelForSequenceClassification.from_pretrained(Model)
+
+document_path = r'C:\Users\Jason\Documents\NerdyBirdyContent.docx'
+doc = Document(document_path)
+
+tokenized_texts = []
+
+for paragraph in doc.paragraphs:
+    tokenized_text = tokenizer(paragraph.text, return_tensors='pt', padding=True, truncation=True)
+    tokenized_texts.append(tokenized_text)
+
+batch_size = 8
+input_batches = [tokenized_texts[i:i+batch_size] for i in range(0, len(tokenized_texts), batch_size)]
+
+for batch in input_batches:
+    with torch.no_grad():
+        outputs = model(**batch[0])
+
+logits = outputs.logits
+predicted_probs = torch.softmax(logits, dim=1).squeeze().tolist()
+
+positive_prob = predicted_probs[1]
+negative_prob = predicted_probs[0]
+
+print("Predicted probabilities:")
+print(f"Positive: {positive_prob:.4f}")
+print(f"Negative: {negative_prob:.4f}")
